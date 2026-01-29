@@ -2,7 +2,7 @@
 
 这是一个符合 Model Context Protocol (MCP) 标准的服务器，允许 AI 助手（如 Claude）访问和导航您的 KERAG 知识库。
 
-## 🔗 相关项目
+## 相关项目
 
 | 项目 | 描述 | 仓库 |
 |---------|-------------|------------|
@@ -10,12 +10,12 @@
 | **KERAG Web** | 可视化知识浏览器，提供 Web 界面用于浏览和搜索 | [TongWang-AI4S/kerag-web](https://github.com/TongWang-AI4S/kerag-web) |
 | **KERAG Modules** | 预构建知识库模块（可直接安装的 tar 文件） | [TongWang-AI4S/KERAG-Modules](https://github.com/TongWang-AI4S/KERAG-Modules) |
 
-## 📚 教程
+## 教程
 
 - **构建知识库**：学习如何编写知识库文件、打包和分发
-  👉 [KERAG-Tutorial.zh.md](https://github.com/TongWang-AI4S/KERAG/blob/main/KERAG-Tutorial.zh.md)
+  [KERAG-Tutorial.zh.md](https://github.com/TongWang-AI4S/KERAG/blob/main/KERAG-Tutorial.zh.md)
 
-## 🚀 快速开始：从零开始安装与运行
+## 快速开始：从零开始安装与运行
 
 可以直接通过 `pip` 或 `uv` 进行安装。
 
@@ -55,7 +55,7 @@ pip install git+https://github.com/TongWang-AI4S/kerag-mcp.git
 
 ---
 
-## ⚙️ 命令行参数
+## 命令行参数
 
 `kerag-mcp` 支持以下可选参数进行配置：
 
@@ -70,13 +70,13 @@ kerag-mcp --transport streamable-http --port 8000
 
 ---
 
-## 🌍 环境变量
+## 环境变量
 您可以根据需要配置以下环境变量：
 - `KERAG_LOCAL`: 本地知识库模块目录（当前工作目录下的 `.kerag_modules`）。
 - `KERAG_HOME`: 全局知识库目录（默认为 `~/.kerag_modules`）。
 - `KERAG_LANG`: 知识库内容语言偏好（如 `zh`, `en`）。
 
-## ✨ 功能
+## 功能
 
 - **搜索**: 在知识库中执行全文搜索。
 - **导航**: 在知识库的层级结构中前后导航或移动。
@@ -90,27 +90,27 @@ kerag-mcp --transport streamable-http --port 8000
 >
 > 或者，在项目的系统提示或记忆中列出相关知识模块，以实现主动检索。
 
-## 🤖 子智能体定义
+## 子智能体定义
 
 本仓库包含一个初步的子智能体定义文件：[`knowledge-explorer.md`](./knowledge-explorer.md)。该文件定义了**知识探索者 (Knowledge Explorer)** 智能体，这是一个专门的研究代理，可以代表主 AI 助手被调用，用于从结构化知识库中导航和提取相关信息。它提供了使用 `knowledge_*` 工具系列进行探索的能力。
 
-## 📋 适用范围
+## 适用范围
 
 KERAG 专为**高度结构化、层级化的内容**而设计：
 
-**✅ 最适合的场景：**
+**最适合的场景：**
 - 技术文档（代码文档、API 参考）
 - 教程和教育材料
 - 教科书和学术笔记
 - 知识总结和百科
 - 任何具有清晰层级结构的内容（章、节、小节）
 
-**❌ 不适用的场景：**
+**不适用的场景：**
 - 叙事性内容（小说、故事）
 - 平铺、非结构化文档（新闻文章、博客文章）
 - 对话记录（聊天记录、对话转录）
 - 任何没有清晰层级结构的内容
 
-## 📄 开源协议
+## 开源协议
 
 本项目采用 MIT 开源协议。
