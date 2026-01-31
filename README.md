@@ -1,114 +1,127 @@
-# KERAG MCP Server
+# KERAG MCP Server (Knowledge Explorer MCP)
 
-This is a Model Context Protocol (MCP) compliant server that allows AI assistants (like Claude) to access and navigate your KERAG knowledge base.
+KERAG MCP is a server compliant with the **Model Context Protocol (MCP)** standard. It serves as a bridge between AI assistants (such as Claude Code, Cursor) and the KERAG knowledge base, allowing AI to navigate, search, and extract context within a structured "knowledge tree" just like humans do.
+
+Unlike simple text retrieval, it empowers AI assistants with the ability to navigate and retrieve information within the KERAG knowledge tree (forest).
 
 ## Related Projects
 
 | Project | Description | Repository |
-|---------|-------------|------------|
-| **KERAG** | Core library for building, packing, and managing knowledge bases | [TongWang-AI4S/KERAG](https://github.com/TongWang-AI4S/KERAG) |
-| **KERAG Web** | Visual knowledge explorer with web interface for browsing and searching | [TongWang-AI4S/kerag-web](https://github.com/TongWang-AI4S/kerag-web) |
-| **KERAG Modules** | Pre-built knowledge base modules (ready-to-install tar archives) | [TongWang-AI4S/KERAG-Modules](https://github.com/TongWang-AI4S/KERAG-Modules) |
+| --- | --- | --- |
+| **KERAG** | Core library for building, packaging, and managing structured knowledge bases | [TongWang-AI4S/KERAG](https://github.com/TongWang-AI4S/KERAG) |
+| **KERAG Web** | Visual browser providing a Web interface for manual exploration | [TongWang-AI4S/kerag-web](https://github.com/TongWang-AI4S/kerag-web) |
 
-## Tutorials
+## Tutorial
 
-- **Building Knowledge Bases**: Learn how to write knowledge base files, package and distribute them
+- **Building a Knowledge Base**: Learn how to write knowledge base files, package, and distribute them
+
   [KERAG-Tutorial.md](https://github.com/TongWang-AI4S/KERAG/blob/main/KERAG-Tutorial.md)
 
-## Quick Start: Installation & Usage
+## Core Features
 
-You can install and run it directly using `pip` or `uv`.
+* **Hierarchical Navigation**: AI can navigate forward and backward through chapters, sections, and subsections of the knowledge base, understanding the context.
+* **Full-text Search**: Supports precise full-text retrieval across massive knowledge modules.
+* **Multi-format Viewing**: Supports outputting node content in Markdown, tree structure, or JSON formats.
+* **Sub-agent Support**: Built-in `knowledge-explorer.md` definition, supporting operation as an independent research agent.
 
-### Step 1: Install MCP Server
+---
 
-**Using uv (Recommended):**
+## Quick Start
+
+### 1. Install the Server
+
+It is recommended to use `uv` for quick installation, but `pip` is also supported:
+
 ```bash
-# Install as a global tool to use the kerag-mcp command anywhere
+# Using uv (recommended)
 uv tool install git+https://github.com/TongWang-AI4S/kerag-mcp.git
-```
 
-**Using pip:**
-```bash
+# Using pip
 pip install git+https://github.com/TongWang-AI4S/kerag-mcp.git
 ```
 
-### Step 2: Configure AI Client (e.g., Claude Code)
+### 2. Configure the AI Client
 
-Add the following to your `.mcp.json`:
+Taking **Claude Code** as an example, add the following to `.mcp.json` or the configuration file:
 
 ```json
 {
   "mcpServers": {
     "knowledge-explorer": {
-        "type": "stdio",
-        "command": "kerag-mcp", 
-        "env": {
-          "KERAG_LANG": "en"
-        }
+      "type": "stdio",
+      "command": "kerag-mcp",
+      "env": {
+        "KERAG_LANG": "en"
       }
     }
+  }
 }
 ```
 
-### Step 3: Verify
-Restart your Claude Code. You should see `kerag` tools (like `knowledge_connect`, `knowledge_load`, etc.) available.
+### 3. Verify Operation
+
+After restarting the client, if you see tools such as `knowledge_connect`, `knowledge_load`, `knowledge_search`, etc., the integration is successful.
 
 ---
 
-## Command Line Arguments
+## Advanced Configuration
 
-`kerag-mcp` supports the following optional arguments:
+### Command Line Arguments
 
-- `--port <number>`: Set the server port (default: `5669`).
-- `--host <address>`: Set the server host (default: `0.0.0.0`).
-- `--transport <type>`: Set the transport protocol: `stdio` (default), `sse`, or `streamable-http`.
+`kerag-mcp` supports custom transport protocols and network settings:
 
-**Example: Running with HTTP transport**
-```bash
-kerag-mcp --transport streamable-http --port 8000
-```
+* `--transport <type>`: Options are `stdio` (default), `sse`, or `streamable-http`.
+* `--port <number>`: Set the port (default `5669`).
+* `--host <address>`: Set the address (default `0.0.0.0`).
+
+### Environment Variables
+
+| Variable Name | Description | Default Value |
+| --- | --- | --- |
+| **KERAG_LOCAL** | Project-local knowledge base path | `./.kerag_modules` |
+| **KERAG_HOME** | Global knowledge base path | `~/.kerag_modules` |
+| **KERAG_LANG** | Knowledge base content language preference | `en` (supports `zh`) |
 
 ---
 
-## Environment Variables
-- `KERAG_LOCAL`: Path to your local knowledge modules.
-- `KERAG_HOME`: Path to global knowledge base (defaults to `~/.kerag_modules`).
-- `KERAG_LANG`: Content language preference (e.g., `zh`, `en`).
+## Usage Tips
 
-## Features
-
-- **Search**: Perform full-text searches across your knowledge base.
-- **Navigate**: Move through the hierarchical structure of your notes.
-- **View**: Inspect nodes in Markdown, Tree, or JSON formats.
-- **Tools**: Provides a set of tools that LLMs can use to retrieve precise context.
-
-> **Important:** You may need **explicitly instruct** the AI assistant to search the knowledge base. AI assistants may not automatically query the knowledge base. Use prompts like:
-> - "Search the knowledge base for [topic]"
-> - "Look up [concept] in the knowledge base"
-> - "What does the knowledge base say about [subject]?"
->
-> Alternatively, list relevant knowledge modules in the system prompt or memory for the project to enable proactive retrieval.
+> [!IMPORTANT]
+> **Explicit Guidance:** AI assistants may not always proactively trigger retrieval. For best results, try commands like:
+> * "Search the knowledge base for definitions about [topic]."
+> * "Find the chapter structure of [module name] in the knowledge base."
+> * "Modify this code according to the API guide in the knowledge base."
 
 ## Sub-agent Definition
 
-This repository includes a preliminary sub-agent definition file: [`knowledge-explorer.md`](./knowledge-explorer.md). This file defines the **Knowledge Explorer** agent, a specialized research agent that can be invoked to navigate and extract relevant information from structured knowledge bases on behalf of the main AI assistant. It provides strategic exploration capabilities using the `knowledge_*` tool series.
+This repository contains a preliminary sub-agent definition file: [`knowledge-explorer.md`](./knowledge-explorer.md). This file defines the **Knowledge Explorer** agent, a specialized research agent that can be invoked on behalf of the main AI assistant to navigate and extract relevant information from structured knowledge bases. It provides the capability to explore using the `knowledge_*` tool series.
+
+---
 
 ## Scope of Application
 
-KERAG is designed for **highly structured, hierarchical content**:
+KERAG is specifically designed for highly structured, hierarchical content:
 
-**Best suited for:**
-- Technical documentation (code docs, API references)
-- Tutorials and educational materials
-- Textbooks and academic notes
-- Knowledge summaries and wikis
-- Any content with clear hierarchical organization (chapters, sections, subsections)
+**Best For:**
+* **Technical Documentation:** Code documentation, API reference manuals.
+* **Educational Materials:** Structured tutorials, textbooks, academic notes.
+* **Knowledge Bases:** Personal experience summaries, encyclopedia entries.
+* **Hierarchical Documents:** Any content with a clear structure of parts, chapters, and sections.
 
-**Not suitable for:**
-- Narrative content (novels, stories)
-- Flat, unstructured documents (news articles, blog posts)
-- Conversational logs (chat histories, transcripts)
-- Any content without clear hierarchical structure
+**Not Recommended For:**
+* **Narrative Content:** Novels, essays, or plot-driven stories.
+* **Unstructured Documents:** Single news reports or casual blog posts.
+* **Streaming Logs:** Chat history, meeting transcripts.
+* **Fragmented Information:** Any flat content lacking clear hierarchical logic.
+
+---
+
+> ### KERAG Modules - Knowledge Base Sharing
+>
+> In the [KERAG-Modules](https://github.com/TongWang-AI4S/KERAG-Modules) repository, I share some knowledge base modules I've generated, which can be installed directly into your KERAG environment.
+> ```bash
+> kerag install https://raw.githubusercontent.com/TongWang-AI4S/KERAG-Modules/refs/heads/main/example/module-name.tar
+> ```
 
 ## License
 
