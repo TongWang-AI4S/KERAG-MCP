@@ -130,6 +130,10 @@ def format_node_info(node: Dict[str, Any]) -> str:
 
     if node_type == 'section':
         lines.append(f"[{node_type}] {title} [@{node_id}]")
+        # 新增: 显示section的content_preview（如果有）
+        content_preview = node.get("content_preview")
+        if content_preview:
+            lines.append(f"\nPreview: {content_preview}")
         # Handle children preview (if any)
         children = node.get("children_preview") or node.get("children", [])
         if children:
@@ -227,13 +231,20 @@ def format_children_preview(children: List[Dict[str, Any]]) -> str:
         if kind == 'section':
             title = child.get("title") or child.get("label") or "Untitled Section"
             lines.append(f"{i}. [section] {title} [@{node_id}]")
+            # 新增: 显示section的内容预览（如果有）
+            content_preview = child.get("content_preview")
+            if content_preview:
+                preview_text = content_preview
+                if len(preview_text) > 80:
+                    preview_text = preview_text[:77] + " ... ... "
+                lines.append(f"    Preview: {preview_text}")
         else:
             # For content type, prioritize content_preview
             main_text = child.get("content_preview") or child.get("label") or "Untitled Content"
 
             # Limit title length to avoid being too long
             if len(main_text) > 80:
-                main_text = main_text[:77] + "..."
+                main_text = main_text[:77] + " ... ... "
 
             lines.append(f"{i}. [{kind}] {main_text}")
             lines.append(f"   [@{node_id}]")

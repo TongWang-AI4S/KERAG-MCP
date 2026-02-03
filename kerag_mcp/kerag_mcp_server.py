@@ -488,7 +488,8 @@ async def knowledge_load(module_name: str) -> str:
 @mcp.tool()
 async def knowledge_search(
     query: str,
-    scope: str = "all",
+    search_under: Optional[str] = None,
+    order: str = "priority",
     max_results: int = 50,
     whole_word: bool = False,
     case_sensitive: bool = False,
@@ -503,11 +504,11 @@ async def knowledge_search(
 
     Args:
         query: Search keywords or regular expression pattern.
-        scope: Where to search - choose based on your needs:
-            - 'all': Search title, label, and content (default, broadest)
-            - 'content': Only in node body/content (useful for finding mentions)
-            - 'title': Only in node titles (fast, good for finding sections)
-            - 'label': Only in node labels (useful for ID-based lookup)
+        search_under: Optional root node ID (e.g. 'module::label' or 'module' being short for 'module::module') to restrict search to a specific subtree.
+            If not provided, searches all loaded modules.
+        order: Sort order for results:
+            - 'priority': Sort by relevance (Title > Content > Label) (default).
+            - 'dfs': Sort by document order (depth-first traversal).
         max_results: Maximum matches to return (default: 50).
         whole_word: Match whole words only (default: False).
         case_sensitive: Case-sensitive matching (default: False).
@@ -523,15 +524,10 @@ async def knowledge_search(
           * Parent node info (if with_parents=True)
           * Content snippet with context
 
-    Scope Selection Guide:
-        - Use 'title' when looking for a specific section by name
-        - Use 'content' when searching for mentions of a concept
-        - Use 'all' for broad discovery searches
-        - Use 'label' when you know the node label
-
     Typical Workflow:
         1. knowledge_search("API authentication")  # Broad search
-        2. knowledge_view(node_id="module::section")  # Read the found node
+        2. knowledge_search("config", search_under="docs::config") # Scoped search
+        3. knowledge_view(node_id="module::section")  # Read the found node
 
     See Also:
         knowledge_view - View full content of a found node
@@ -546,7 +542,8 @@ async def knowledge_search(
 
     search_res = api.search(
         keyword=query,
-        scope=scope,
+        search_under=search_under,
+        order=order,
         max_results=max_results,
         whole_word=whole_word,
         case_sensitive=case_sensitive,
@@ -595,10 +592,17 @@ async def knowledge_view(
     Args:
         node_id: Target node ID in 'module::label' format (e.g., 'docs::intro').
             Uses current location if not provided.
-        depth: How much context to show around the node:
-            - 0: Current node content only
-            - 1: Node content + child node titles (default, recommended)
-            - >1: Include more levels of hierarchy
+        depth: Hierarchy depth to display, with the target node as depth=0:
+            - 0: Current node content only, no children preview
+            - 1: Node content + immediate children preview (default, recommended)
+            - >1: Include deeper levels of hierarchy with nested previews
+
+            Children at the maximum depth level when depth > 0 or the target node when depth=0 are shown in preview form:
+            - Content node: Displays content preview (first 80 chars of body text),
+              truncated with "... ..." if exceeded. Format: [content] {preview_text}
+            - Section node: Displays section title with [section] tag, plus content
+              preview if available. Format: [section] {title} [@{node_id}]
+              with optional Preview line
         format: Output style - 'markdown' (default), 'text', 'tree', or 'json'.
         include_content: Include node body text (default: True).
         include_see_also: Include cross-reference links (@node_id) (default: True).
